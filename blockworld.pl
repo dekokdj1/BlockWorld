@@ -87,7 +87,7 @@ dfs(X, [X|Ypath], VISITED):-
 
 
 % starting position is a on table, c on a, b on c, clear b
-start([[on, a, "table"], [on, c, a], [on, b, c], [clear, b]]).
+start([[on, a, b], [on, b, “table”], [on, c, d], [clear, c], [clear, a], [on, d, “table”]]).
 
 %goal moves
 %dfs ab for goal dacb
@@ -104,7 +104,7 @@ start([[on, a, "table"], [on, c, a], [on, b, c], [clear, b]]).
 %clear d
 
 % goal is c on table, b on c, a on b, clear d
-goal([[on, c, "table"], [on, b, c], [on, a, b], [clear, d]]).
+goal([[on, d, a], [on, a, c], [on, c, b], [on, b, “table’], [clear d]]).
 
 % print the path from start to goal, if it exists
 printPath(Start, Goal):-
