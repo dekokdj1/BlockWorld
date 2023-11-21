@@ -12,7 +12,7 @@ printList([H|T]):- write(H), nl, printList(T).
 
 % block(X) holds when X is a block.
 block(a).
-block(b).
+block(b). 	
 block(c).
 block(d).
 
@@ -32,20 +32,23 @@ move(X, Y, Z, S1, S2):-
 	substitute([clear, Z], [clear, Y], INT, S2). % Z is no longer clear; Y is now clear
 	
 % You must write two more rules for the blocks’ world: 
-% (i)	move from a block onto the table, and 
-move(X, Y, table, S1, S2):-
+% move_onto_table(X, Y, S1, S2) holds when the state S2 is obtained from the state S1 by moving the block X from the block Y onto the table.
+move_onto_table(X, Y, S1, S2):-
 	member([clear, X], S1), %find a clear block X in S1
-	member([on, X, Y], S1), block(Y), %find a block on which X sits
+	member([on, X, Y], S1),
+	block(Y), %find a block on which X sits
 	substitute([on, X, Y], [on, X, table], S1, INT),  %remove X from Y, place it on Z
-	substitute([clear, table], [clear, Y], INT, S2). % Z is no longer clear; Y is now clear
+	%start([[on, a, b], [on, b, table], [on, c, d], [clear, c], [clear, a], [on, d, table]]).
+	%substitute([clear, table], [clear, Y], INT, S2). % Z is no longer clear; Y is now clear
 
-% (ii)	move from the table onto a block
-move(X, table, Y, S1, S2):-
+% move_onto_block(X, Y, S1, S2) holds when the state S2 is obtained from the state S1 by moving the block X from the table onto block Y.
+move_onto_block(X, Y, S1, S2):-
 	member([clear, X], S1), %find a clear block X in S1
 	member([on, X, table], S1), %find a block on which X sits
-	member([clear, Y], S1), notequal(X, Y), %find another clear block, Z
-	substitute([on, X, table], [on, X, Y], S1, INT),  %remove X from Y, place it on Z
-	substitute([clear, Y], [clear, table], INT, S2). % Z is no longer clear; Y is now clear
+	member([clear, Y], S1), %find another clear block, Y
+	notequal(X, Y), 
+	substitute([on, X, table], [on, X, Y], S1, INT),  %remove X from table, place it on Y
+	%substitute([clear, Y], [clear, table], INT, S2). % Z is no longer clear; Y is now clear
 
 % notequal(X1, X2) takes two arguments and holds true when these arguments are not equal.  In other words, it fails when the arguments are equal and otherwise succeeds.
 notequal(X, X):-!, fail. % fail, if equal.
