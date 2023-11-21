@@ -14,6 +14,7 @@ printList([H|T]):- write(H), nl, printList(T).
 block(a).
 block(b).
 block(c).
+block(d).
 
 
 block(X):-
@@ -21,7 +22,7 @@ block(X):-
     member(X, BLOCKS).
 
 % blocks(L) holds when L is a list of blocks.
-blocks([a, b, c]).
+blocks([a, b, c, d]).
 
 % move(X, Y, Z, S1, S2) holds when the state S2 is obtained from the state S1 by moving the block X from the block Y onto the block Z.
 move(X, Y, Z, S1, S2):-
@@ -102,15 +103,11 @@ start([[on, a, "table"], [on, c, a], [on, b, c], [clear, b]]).
 %move d on top of a
 %clear d
 
-% goal is c on table, b on c, a on b, clear a
-goal([[on, c, "table"], [on, b, c], [on, a, b], [clear, a]]).
+% goal is c on table, b on c, a on b, clear d
+goal([[on, c, "table"], [on, b, c], [on, a, b], [clear, d]]).
 
 % print the path from start to goal, if it exists
 printPath(Start, Goal):-
 	dfs(Start, Path, [Start]),
 	write('Path from '), write(Start), write(' to '), write(Goal), write(':'), nl,
 	printList(Path).
-
-
-
-
