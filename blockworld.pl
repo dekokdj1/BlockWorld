@@ -10,6 +10,10 @@ notmember(X, [H|T]):- X \= H, notmember(X, T),!.
 printList([]).
 printList([H|T]):- write(H), nl, printList(T).
 
+remover(_, [], []).
+remover(R, [R|T], T).
+remover(R, [H|T], [H|T2]) :- H \= R, remover(R, T, T2).
+
 % block(X) holds when X is a block.
 block(a).
 block(b). 	
@@ -38,17 +42,15 @@ move_onto_table(X, Y, S1, S2):-
 	member([on, X, Y], S1),
 	block(Y), %find a block on which X sits
 	substitute([on, X, Y], [on, X, table], S1, INT),  %remove X from Y, place it on Z
-	%start([[on, a, b], [on, b, table], [on, c, d], [clear, c], [clear, a], [on, d, table]]).
-	%substitute([clear, table], [clear, Y], INT, S2). % Z is no longer clear; Y is now clear
+	append([clear, Y], INT, S2).%Y is now clear
 
-% move_onto_block(X, Y, S1, S2) holds when the state S2 is obtained from the state S1 by moving the block X from the table onto block Y.
 move_onto_block(X, Y, S1, S2):-
 	member([clear, X], S1), %find a clear block X in S1
 	member([on, X, table], S1), %find a block on which X sits
 	member([clear, Y], S1), %find another clear block, Y
-	notequal(X, Y), 
+	notequal(X, Y), %X not Y
 	substitute([on, X, table], [on, X, Y], S1, INT),  %remove X from table, place it on Y
-	%substitute([clear, Y], [clear, table], INT, S2). % Z is no longer clear; Y is now clear
+	remover([clear, Y], INT, S2). %y is no longer clear
 
 % notequal(X1, X2) takes two arguments and holds true when these arguments are not equal.  In other words, it fails when the arguments are equal and otherwise succeeds.
 notequal(X, X):-!, fail. % fail, if equal.
@@ -64,7 +66,7 @@ substitute(X, Y, [H|T], [H|T1]):-
 
 % there is a path from state S1 to state S2 when there is a move from S1 to S2.
 path(S1, S2):-
-	move(X, Y, Z, S1, S2).
+	move(_, _, _, S1, S2).
 
 % connect is the symmetric version of path: states S1 and S2 are connected if there is a path from S1 to S2 or a path from S2 to S1.
 connect(S1, S2) :- path(S1, S2).
