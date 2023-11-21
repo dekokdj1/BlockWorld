@@ -1,66 +1,77 @@
-% Facts to represent the initial state of the blocks world
-% (blocks are initially on top of each other as specified in the original question)
-on(a, b).
-on(b, c).
-on(c, table).
-clear(a).
-clear(table).
+% Your existing code
 
-% Rules to define the possible actions in the blocks world
-% Rule 2a: Move a block from one position to another
-apply_action(State, move(Block, From, To), NewState) :-
-    % Preconditions for the move
-    select([clear(Block), clear(To), on(Block, From)], State, IntermediateState),
-    % Add the block to the new position
-    NewState = [on(Block, To) | IntermediateState].
+% Define the list of blocks in your world
+blocks([a, b, c, d, e, f]).
 
-% Rule 2b: Move a block from one position to another
-apply_action(State, move(Block, From, To), NewState) :-
-    % Preconditions for the move
-    select([clear(Block), clear(To), on(Block, From)], State, IntermediateState),
-    % Add the block to the new position
-    NewState = [on(Block, To), clear(From) | IntermediateState].
+% Define a predicate to check if X is a block
+block(X) :-
+    blocks(BLOCKS),  % Extract the list BLOCKS
+    member(X, BLOCKS).
 
-% Rule 2c: Move a block from one position to another
-apply_action(State, move(Block, From, To), NewState) :-
-    % Preconditions for the move
-    select([clear(Block), clear(To), on(Block, From)], State, IntermediateState),
-    % Add the block to the new position
-    NewState = [on(Block, To), clear(From), not(clear(To)) | IntermediateState].
+% Predicate to check if two terms are not equal
+notequal(X, X) :- !, fail.
+notequal(_, _).
 
-% Rule 3a: Move a block from on top of another to the table
-apply_action(State, move_to_table(Block, From), NewState) :-
-    % Preconditions for the move
-    select([clear(Block), on(Block, From)], State, IntermediateState),
-    % Add the block to the table
-    NewState = [on(Block, table) | IntermediateState].
+% Predicate to substitute an element in a list
+substitute(X, Y, [X|T], [Y|T]).
+substitute(X, Y, [H|T], [H|T1]) :-
+    substitute(X, Y, T, T1).
 
-% Rule 3b: Move a block from on top of another to the table
-apply_action(State, move_to_table(Block, From), NewState) :-
-    % Preconditions for the move
-    select([clear(Block), on(Block, From)], State, IntermediateState),
-    % Add the block to the table
-    NewState = [on(Block, table), clear(From) | IntermediateState].
+% Predicate to move a block from one position to another
+move(X, Y, Z, S1, S2) :-
+    member([clear, X], S1),
+    member([on, X, Y], S1), block(Y),
+    member([clear, Z], S1), notequal(X, Z),
+    substitute([on, X, Y], [on, X, Z], S1, INT),
+    substitute([clear, Z], [clear, Y], INT, S2).
 
-% Rule 4a: Move a block from the table to on top of another block
-apply_action(State, move_to_block(Block, To), NewState) :-
-    % Preconditions for the move
-    select([clear(Block), on(Block, table)], State, IntermediateState),
-    % Add the block on top of another block
-    NewState = [on(Block, To) | IntermediateState].
+% Predicate to move a block from on top of another to the table
+move_to_table(X, Y, S1, S2) :-
+    member([clear, X], S1),
+    member([on, X, Y], S1), block(Y),
+    substitute([on, X, Y], [on, X, 'table'], S1, INT),
+    substitute([clear, 'table'], [clear, Y], INT, S2).
 
-% Rule 4b: Move a block from the table to on top of another block
-apply_action(State, move_to_block(Block, To), NewState) :-
-    % Preconditions for the move
-    select([clear(Block), on(Block, table)], State, IntermediateState),
-    % Add the block on top of another block
-    NewState = [on(Block, To), not(clear(To)) | IntermediateState].
+% Predicate to move a block from the table onto another block
+move_to_block(X, Z, S1, S2) :-
+    member([clear, X], S1),
+    member([on, X, 'table'], S1),
+    member([clear, Z], S1), notequal(X, Z),
+    substitute([on, X, 'table'], [on, X, Z], S1, INT),
+    substitute([clear, Z], [clear, 'table'], INT, S2).
 
-% Helper predicate to remove an element from a list
-select(X, [X|Tail], Tail).
-select(X, [Y|Tail], [Y|Rest]) :- select(X, Tail, Rest).
+% Predicate to check if there is a move from S1 to S2
+path(S1, S2):-
+    move(_, _, _, S1, S2).
+    
+% Connect is the symmetric version of path: states S1 and S2 are connected if there is a path from S1 to S2 or a path from S2 to S1.
+connect(S1, S2) :- path(S1, S2).
+connect(S1, S2) :- path(S2, S1).
 
-% Example usage:
-% Initial state: State = [on(a, b), on(b, c), on(c, table), clear(a), clear(table)].
-% Action: move(a, b, table).
-% New state: NewState = [on(a, table), on(b, c), on(c, table), clear(b), clear(table)].
+% Predicate to check if there is a path from S1 to S2 with a given path so far
+path(S1, S2, Path) :-
+    move(_, _, _, S1, S2),
+    \+ state_in_path(S2, Path).
+
+% Predicate to check if a state is in the path, considering permutations
+state_in_path(State, Path) :-
+    permutation(State, Perm),
+    member(Perm, Path).
+
+% Predicate to check if a state has not yet been visited
+notYetVisited(State, PathSoFar) :-
+    permutation(State, PermuteState),
+    \+ member(PermuteState, PathSoFar).
+
+% dfs predicate
+dfs(X, [X], _):- goal(X).
+dfs(X, [X|Ypath], VISITED):-
+    connect(X, Y),
+    notYetVisited(Y, VISITED),
+    dfs(Y, _, [Y|VISITED]).
+
+% Example start state
+start([[on, a, b], [on, b, 'table'], [on, c, d], [clear, c], [clear, a], [on, d, 'table']]).
+
+% Example goal state
+goal([[on, d, a], [on, a, c], [on, c, b], [on, b, 'table'], [clear, a]]).
