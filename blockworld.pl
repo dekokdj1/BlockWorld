@@ -1,8 +1,27 @@
-blocks([a, b, c, d, e]).
+% member(X, L) holds when X is a member of the list L.
+member(X, [X|_]).
+member(X, [_|T]):- member(X, T),!.
+
+% notmember(X, L) holds when X is not a member of the list L.
+notmember(_, []).
+notmember(X, [H|T]):- X \= H, notmember(X, T),!.
+
+% printList(L) prints the list L.
+printList([]).
+printList([H|T]):- write(H), nl, printList(T).
+
+% block(X) holds when X is a block.
+block(a).
+block(b).
+block(c).
+
 
 block(X):-
     block(BLOCKS),  % this extracts the list BLOCKS
     member(X, BLOCKS).
+
+% blocks(L) holds when L is a list of blocks.
+blocks([a, b, c]).
 
 % move(X, Y, Z, S1, S2) holds when the state S2 is obtained from the state S1 by moving the block X from the block Y onto the block Z.
 move(X, Y, Z, S1, S2):-
@@ -66,12 +85,10 @@ dfs(X, [X|Ypath], VISITED):-
 	dfs(Y, Ypath, [Y|VISITED]).
 
 
-% starting position is d on table, b on d, c on b, a on c, e on a, clear e
-start([[on, d, "table"], [on, b, d], [on, c, b], [on, a, c], [on, e, a], [clear, e]]).
-
-% goal is e on table, d on e, c on d, b on c, a on b, clear a
-goal([[on, e, "table"], [on, d, e], [on, c, d], [on, b, c], [on, a, b], [clear, a]]).
-
+% starting position is a on table, c on a, b on c, clear b
+start([[on, a, "table"], [on, c, a], [on, b, c], [clear, b]]).
+% goal is c on table, b on c, a on b, clear a
+goal([[on, c, "table"], [on, b, c], [on, a, b], [clear, a]]).
 
 % print the path from start to goal, if it exists
 printPath(Start, Goal):-
