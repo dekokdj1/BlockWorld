@@ -1,0 +1,77 @@
+% Your existing code
+
+% Define the list of blocks in your world
+blocks([a, b, c, d, e, f]).
+
+% Define a predicate to check if X is a block
+block(X) :-
+    blocks(BLOCKS),  % Extract the list BLOCKS
+    member(X, BLOCKS).
+
+% Predicate to check if two terms are not equal
+notequal(X, X) :- !, fail.
+notequal(_, _).
+
+% Predicate to substitute an element in a list
+substitute(X, Y, [X|T], [Y|T]).
+substitute(X, Y, [H|T], [H|T1]) :-
+    substitute(X, Y, T, T1).
+
+% Predicate to move a block from one position to another
+move(X, Y, Z, S1, S2) :-
+    member([clear, X], S1),
+    member([on, X, Y], S1), block(Y),
+    member([clear, Z], S1), notequal(X, Z),
+    substitute([on, X, Y], [on, X, Z], S1, INT),
+    substitute([clear, Z], [clear, Y], INT, S2).
+
+% Predicate to move a block from on top of another to the table
+move_to_table(X, Y, S1, S2) :-
+    member([clear, X], S1),
+    member([on, X, Y], S1), block(Y),
+    substitute([on, X, Y], [on, X, 'table'], S1, INT),
+    substitute([clear, 'table'], [clear, Y], INT, S2).
+
+% Predicate to move a block from the table onto another block
+move_to_block(X, Z, S1, S2) :-
+    member([clear, X], S1),
+    member([on, X, 'table'], S1),
+    member([clear, Z], S1), notequal(X, Z),
+    substitute([on, X, 'table'], [on, X, Z], S1, INT),
+    substitute([clear, Z], [clear, 'table'], INT, S2).
+
+% Predicate to check if there is a move from S1 to S2
+path(S1, S2):-
+    move(_, _, _, S1, S2).
+    
+% Connect is the symmetric version of path: states S1 and S2 are connected if there is a path from S1 to S2 or a path from S2 to S1.
+connect(S1, S2) :- path(S1, S2).
+connect(S1, S2) :- path(S2, S1).
+
+% Predicate to check if there is a path from S1 to S2 with a given path so far
+path(S1, S2, Path) :-
+    move(_, _, _, S1, S2),
+    \+ state_in_path(S2, Path).
+
+% Predicate to check if a state is in the path, considering permutations
+state_in_path(State, Path) :-
+    permutation(State, Perm),
+    member(Perm, Path).
+
+% Predicate to check if a state has not yet been visited
+notYetVisited(State, PathSoFar) :-
+    permutation(State, PermuteState),
+    \+ member(PermuteState, PathSoFar).
+
+% dfs predicate
+dfs(X, [X], _):- goal(X).
+dfs(X, [X|Ypath], VISITED):-
+    connect(X, Y),
+    notYetVisited(Y, VISITED),
+    dfs(Y, _, [Y|VISITED]).
+
+% Example start state
+start([[on, a, b], [on, b, 'table'], [on, c, d], [clear, c], [clear, a], [on, d, 'table']]).
+
+% Example goal state
+goal([[on, d, a], [on, a, c], [on, c, b], [on, b, 'table'], [clear, a]]).
