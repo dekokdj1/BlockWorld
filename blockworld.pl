@@ -16,7 +16,6 @@ block(b).
 block(c).
 block(d).
 
-
 block(X):-
     block(BLOCKS),  % this extracts the list BLOCKS
     member(X, BLOCKS).
@@ -34,19 +33,19 @@ move(X, Y, Z, S1, S2):-
 	
 % You must write two more rules for the blocks’ world: 
 % (i)	move from a block onto the table, and 
-move(X, Y, "table", S1, S2):-
+move(X, Y, table, S1, S2):-
 	member([clear, X], S1), %find a clear block X in S1
 	member([on, X, Y], S1), block(Y), %find a block on which X sits
-	substitute([on, X, Y], [on, X, "table"], S1, INT),  %remove X from Y, place it on Z
-	substitute([clear, "table"], [clear, Y], INT, S2). % Z is no longer clear; Y is now clear
+	substitute([on, X, Y], [on, X, table], S1, INT),  %remove X from Y, place it on Z
+	substitute([clear, table], [clear, Y], INT, S2). % Z is no longer clear; Y is now clear
 
 % (ii)	move from the table onto a block
-move(X, "table", Y, S1, S2):-
+move(X, table, Y, S1, S2):-
 	member([clear, X], S1), %find a clear block X in S1
-	member([on, X, "table"], S1), %find a block on which X sits
+	member([on, X, table], S1), %find a block on which X sits
 	member([clear, Y], S1), notequal(X, Y), %find another clear block, Z
-	substitute([on, X, "table"], [on, X, Y], S1, INT),  %remove X from Y, place it on Z
-	substitute([clear, Y], [clear, "table"], INT, S2). % Z is no longer clear; Y is now clear
+	substitute([on, X, table], [on, X, Y], S1, INT),  %remove X from Y, place it on Z
+	substitute([clear, Y], [clear, table], INT, S2). % Z is no longer clear; Y is now clear
 
 % notequal(X1, X2) takes two arguments and holds true when these arguments are not equal.  In other words, it fails when the arguments are equal and otherwise succeeds.
 notequal(X, X):-!, fail. % fail, if equal.
@@ -87,11 +86,11 @@ dfs(X, [X|Ypath], VISITED):-
 
 
 % starting position is a on table, c on a, b on c, clear b
-start([[on, a, b], [on, b, “table”], [on, c, d], [clear, c], [clear, a], [on, d, “table”]]).
+start([[on, a, b], [on, b, table], [on, c, d], [clear, c], [clear, a], [on, d, table]]).
 
 %goal moves
 %dfs ab for goal dacb
-%reach [on, b, "table"]
+%reach [on, b, table]
 %begin backtracking
 %reach a, a!=c
 %clear b (a on table)
@@ -104,7 +103,7 @@ start([[on, a, b], [on, b, “table”], [on, c, d], [clear, c], [clear, a], [on
 %clear d
 
 % goal is c on table, b on c, a on b, clear d
-goal([[on, d, a], [on, a, c], [on, c, b], [on, b, “table’], [clear d]]).
+goal([[on, d, a], [on, a, c], [on, c, b], [on, b, table], [clear d]]).
 
 % print the path from start to goal, if it exists
 printPath(Start, Goal):-
