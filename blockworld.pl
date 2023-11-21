@@ -87,6 +87,21 @@ dfs(X, [X|Ypath], VISITED):-
 
 % starting position is a on table, c on a, b on c, clear b
 start([[on, a, "table"], [on, c, a], [on, b, c], [clear, b]]).
+
+%goal moves
+%dfs ab for goal dacb
+%reach [on, b, "table"]
+%begin backtracking
+%reach a, a!=c
+%clear b (a on table)
+%is c clear?
+%move c on top of b
+%is a clear?
+%move a on top of c
+%is d clear?
+%move d on top of a
+%clear d
+
 % goal is c on table, b on c, a on b, clear a
 goal([[on, c, "table"], [on, b, c], [on, a, b], [clear, a]]).
 
