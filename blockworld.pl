@@ -103,7 +103,7 @@ start([[on, a, b], [on, b, table], [on, c, d], [clear, c], [clear, a], [on, d, t
 %clear d
 
 % goal is c on table, b on c, a on b, clear d
-goal([[on, d, a], [on, a, c], [on, c, b], [on, b, table], [clear d]]).
+goal([[on, d, a], [on, a, c], [on, c, b], [on, b, table], [clear, d]]).
 
 % print the path from start to goal, if it exists
 printPath(Start, Goal):-
