@@ -63,7 +63,7 @@ dfs(X, [X|Ypath], VISITED):-
  	connect(X, Y),
 	%negmember(Y, VISITED), % replace negmember by notYetVisited when using on the block world
   	notYetVisited(Y, VISITED),
-	dfs(Y, FILLIN, [Y|VISITED]).
+	dfs(Y, Ypath, [Y|VISITED]).
 
 
 % starting position is d on table, b on d, c on b, a on c, e on a, clear e
