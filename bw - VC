@@ -1,0 +1,66 @@
+% Facts to represent the initial state of the blocks world
+% (blocks are initially on top of each other as specified in the original question)
+on(a, b).
+on(b, c).
+on(c, table).
+clear(a).
+clear(table).
+
+% Rules to define the possible actions in the blocks world
+% Rule 2a: Move a block from one position to another
+apply_action(State, move(Block, From, To), NewState) :-
+    % Preconditions for the move
+    select([clear(Block), clear(To), on(Block, From)], State, IntermediateState),
+    % Add the block to the new position
+    NewState = [on(Block, To) | IntermediateState].
+
+% Rule 2b: Move a block from one position to another
+apply_action(State, move(Block, From, To), NewState) :-
+    % Preconditions for the move
+    select([clear(Block), clear(To), on(Block, From)], State, IntermediateState),
+    % Add the block to the new position
+    NewState = [on(Block, To), clear(From) | IntermediateState].
+
+% Rule 2c: Move a block from one position to another
+apply_action(State, move(Block, From, To), NewState) :-
+    % Preconditions for the move
+    select([clear(Block), clear(To), on(Block, From)], State, IntermediateState),
+    % Add the block to the new position
+    NewState = [on(Block, To), clear(From), not(clear(To)) | IntermediateState].
+
+% Rule 3a: Move a block from on top of another to the table
+apply_action(State, move_to_table(Block, From), NewState) :-
+    % Preconditions for the move
+    select([clear(Block), on(Block, From)], State, IntermediateState),
+    % Add the block to the table
+    NewState = [on(Block, table) | IntermediateState].
+
+% Rule 3b: Move a block from on top of another to the table
+apply_action(State, move_to_table(Block, From), NewState) :-
+    % Preconditions for the move
+    select([clear(Block), on(Block, From)], State, IntermediateState),
+    % Add the block to the table
+    NewState = [on(Block, table), clear(From) | IntermediateState].
+
+% Rule 4a: Move a block from the table to on top of another block
+apply_action(State, move_to_block(Block, To), NewState) :-
+    % Preconditions for the move
+    select([clear(Block), on(Block, table)], State, IntermediateState),
+    % Add the block on top of another block
+    NewState = [on(Block, To) | IntermediateState].
+
+% Rule 4b: Move a block from the table to on top of another block
+apply_action(State, move_to_block(Block, To), NewState) :-
+    % Preconditions for the move
+    select([clear(Block), on(Block, table)], State, IntermediateState),
+    % Add the block on top of another block
+    NewState = [on(Block, To), not(clear(To)) | IntermediateState].
+
+% Helper predicate to remove an element from a list
+select(X, [X|Tail], Tail).
+select(X, [Y|Tail], [Y|Rest]) :- select(X, Tail, Rest).
+
+% Example usage:
+% Initial state: State = [on(a, b), on(b, c), on(c, table), clear(a), clear(table)].
+% Action: move(a, b, table).
+% New state: NewState = [on(a, table), on(b, c), on(c, table), clear(b), clear(table)].
