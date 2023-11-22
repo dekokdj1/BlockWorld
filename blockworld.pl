@@ -74,17 +74,18 @@ notYetVisited(State, PathSoFar):-
 	permutation(State, PermuteState),
 	notmember(PermuteState, PathSoFar).
 
-
 % dfs(Start, Path, PathSoFar): returns the Path from the start to the goal state given the path so far.
-% Trivial: if X is the goal return X as the path from X to X.
-dfs(X, [X],_):- goal(X).
+dfs(Start, Path, PathSoFar):-
+	%todo
 
+% Trivial: if X is the goal return X as the path from X to X.
+dfs(X, [X], _):- goal(X).
 % else expand X by Y and find path from Y
 dfs(X, [X|Ypath], VISITED):-
  	connect(X, Y),
 	%negmember(Y, VISITED), % replace negmember by notYetVisited when using on the block world
   	notYetVisited(Y, VISITED),
-	dfs(Y, [Ypath], [Y|VISITED]).
+	dfs(Y, Ypath, [Y|VISITED]).
 
 
 % starting position 
@@ -93,10 +94,10 @@ start([[on, a, "table"], [on, b, "table"], [on, c, a], [on, d, b], [on, e, c], [
 goal([[on, e, "table"], [on, d, e], [on, c, d], [on, b, c], [on, a, b], [clear, a]]).
 
 % print the path from start to goal, if it exists
-printPath(Start, Goal):-
-	dfs(Start, Path, [Start]),
-	write('Path from '), write(Start), write(' to '), write(Goal), write(':'), nl,
-	printList(Path).
+% printPath(Start, Goal, Path):-
+% 	dfs(Start, Path, [Start]),!,
+% 	write('Path from '), write(Start), write(' to '), write(Goal), write(':'), nl,
+% 	printList(Path).
 
 
 
