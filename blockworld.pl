@@ -76,18 +76,6 @@ notYetVisited(State, PathSoFar):-
 	permutation(State, PermuteState),
 	notmember(PermuteState, PathSoFar).
 
-% % % DFS predicate to find a path from Start to Goal
-% dfs(Start, Goal, Path) :-
-%     dfs_util(Start, Goal, [Start], Path).
-
-% % % Internal DFS predicate with loop avoidance
-% dfs_util(Goal, Goal, _, [Goal]) :- !.
-% dfs_util(Current, Goal, Visited, [Current | Path]) :-
-%     connect(Current, Next),
-%     notYetVisited(Next, Visited),
-%     dfs_util(Next, Goal, [Next | Visited], Path).
-
-
 % starting position 
 start([[on, a, "table"], [on, b, "table"], [on, c, a], [on, d, b], [on, e, c], [clear, e], [clear, d]]).
 % start([[on, a, "table"], [on, b, "table"], [on, c, a], [clear, c], [clear, b]]).
@@ -98,14 +86,27 @@ goal([[on, e, "table"], [on, d, e], [on, c, d], [on, b, c], [on, a, b], [clear, 
 % goal([[on, a, "table"], [on, c, a], [on, b, c], [clear, b]]).
 
 
-% Trivial: if X is the goal return X as the path from X to X.
-dfs(X, [X], VISITED):- permutation(X,P),goal(P),!.
-% else expand X by Y and find path from Y
-dfs(X, [X|Ypath], VISITED):-
- 	connect(X, Y),printList(X),
-	%negmember(Y, VISITED), % replace negmember by notYetVisited when using on the block world
-  	notYetVisited(Y, VISITED),
-	dfs(Y, Ypath, [Y|VISITED]).
+% % Trivial: if X is the goal return X as the path from X to X.
+% dfs(X, [X], VISITED):- permutation(X,P),goal(P),!.
+% % else expand X by Y and find path from Y
+% dfs(X, [X|Ypath], VISITED):-
+%  	connect(X, Y),printList(VISITED),
+% 	%negmember(Y, VISITED), % replace negmember by notYetVisited when using on the block world
+%   	notYetVisited(Y, VISITED),
+% 	dfs(Y, Ypath, [Y|VISITED]).
 
+
+dfs(Start, Goal, Path) :-
+    dfs_util(Start, Goal, [Start], Path).
+
+
+
+% Internal DFS predicate with loop avoidance
+dfs_util(Goal, Goal, _, [Goal]) :- !.
+dfs_util(Current, Goal, Visited, [Current | Path]) :-
+    connect(Current, Next),%printList(Visited),
+    notYetVisited(Next, Visited),
+    dfs_util(Next, Goal, [Next | Visited], Path).
 
 % start(S),goal(G), dfs(S,P,[S]).
+% start(S),goal(G), dfs(S,G,P),printList(P).
