@@ -94,5 +94,17 @@ dfs_util(Current, Goal, Visited, [Current | Path]) :-
     notYetVisited(Next, Visited),
     dfs_util(Next, Goal, [Next | Visited], Path).
 
+dfs(Start, Goal, Path) :-
+    dfs_util(Start, Goal, [Start], Path).
+
+
+
+% Internal DFS predicate with loop avoidance
+dfs_util(Goal, Goal, _, [Goal]) :- !.
+dfs_util(Current, Goal, Visited, [Current | Path]) :-
+    connect(Current, Next),%printList(Visited),
+    notYetVisited(Next, Visited),
+    dfs_util(Next, Goal, [Next | Visited], Path).
+
 % start(S),goal(G), dfs(S,P,[S]).
 %new  start(S),goal(G), dfs(S,G,P), printList(P).
