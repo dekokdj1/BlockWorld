@@ -26,6 +26,7 @@ notequal(_, _).          % otherwise, succeed.
 % substitute (E, E1, OLD, NEW) holds when NEW is the list OLD in which E is substituted by E1.  There are no duplicates in OLD or NEW.
 substitute(X, Y, [X|T], [Y|T]).  % Here, the head X of [X|T] is substituted by Y to yield the list with the head Y to produce the list [Y|T].  The tails of OLD and NEW are the same, because we seek to substitute only one occurrence.
 
+
 substitute(X, Y, [H|T], [H|T1]):- 
     substitute(X, Y, T, T1).  % In this clause the element to be substituted is NOT the head of the list, so the head H of the list [H|T] carries over to the head H of the new list, but the tail of the new list is obtained from the tail T of the old list where the element X was substituted by Y, producing the new list [H|T1].
 
@@ -34,10 +35,12 @@ substitute(X, Y, [H|T], [H|T1]):-
 blocks([a, b, c, d, e]).
 % blocks([a, b, c]).
 
+
 % Then a generic block, say X, is a member of the list of blocks
 block(X):-
     blocks(BLOCKS),  % this extracts the list BLOCKS
     member(X, BLOCKS).
+
 
 % move(X, Y, Z, S1, S2) holds when the state S2 is obtained from the state S1 
 % by moving the block X from the block Y onto the block Z.
@@ -49,6 +52,7 @@ moveblockblock(X, Y, Z, S1, S2):-
 	substitute([clear, Z], [clear, Y], INT, S2). % Z is no longer clear; Y is now clear
 	
 % You must write two more rules for the blocks’ world: 
+
 % (i)	move from a block X onto the table, and 
 moveblocktable(X, Y, S1, S2):- %move(X, Y, "table", S1, S2)
 	member([clear, X], S1), %find a clear block X in S1
@@ -63,6 +67,7 @@ movetableblock(X, Z, S1, S2):- %move(X, "table", Z, S1, S2)
 	member([clear, Z], S1), X \= Z, %find another clear block, Z
 	substitute([on, X, "table"], [on, X, Z], S1, INT),  %add X on z
 	remove(INT, [clear, Z], S2). % Z is no longer clear
+
 
 % there is a path from state S1 to state S2 when there is a move from S1 to S2.
 path(S1, S2):-
@@ -87,6 +92,7 @@ goal([[on, e, "table"], [on, d, e], [on, c, d], [on, b, c], [on, a, b], [clear, 
 dfs(Start, Goal, Path) :-
     dfs_util(Start, Goal, [Start], Path).
 
+
 % Internal DFS predicate with loop avoidance
 dfs_util(Goal, Goal, _, [Goal]) :- !.
 dfs_util(Current, Goal, Visited, [Current | Path]) :-
@@ -108,3 +114,4 @@ dfs_util(Current, Goal, Visited, [Current | Path]) :-
 
 % start(S),goal(G), dfs(S,P,[S]).
 %new  start(S),goal(G), dfs(S,G,P), printList(P).
+
