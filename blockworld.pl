@@ -70,23 +70,10 @@ path(S1, S2):-
 
 % connect is the symmetric version of path: states S1 and S2 are connected if there is a path from S1 to S2 or a path from S2 to S1.
 connect(S1, S2) :- path(S1, S2), path(S2, S1).
-% connect(S1, S2) :- path(S2, S1).%todo can i shorten this
 
 notYetVisited(State, PathSoFar):-
 	permutation(State, PermuteState),
 	notmember(PermuteState, PathSoFar).
-
-% % % DFS predicate to find a path from Start to Goal
-% dfs(Start, Goal, Path) :-
-%     dfs_util(Start, Goal, [Start], Path).
-
-% % % Internal DFS predicate with loop avoidance
-% dfs_util(Goal, Goal, _, [Goal]) :- !.
-% dfs_util(Current, Goal, Visited, [Current | Path]) :-
-%     connect(Current, Next),
-%     notYetVisited(Next, Visited),
-%     dfs_util(Next, Goal, [Next | Visited], Path).
-
 
 % starting position 
 start([[on, a, "table"], [on, b, "table"], [on, c, a], [on, d, b], [on, e, c], [clear, e], [clear, d]]).
@@ -97,15 +84,15 @@ start([[on, a, "table"], [on, b, "table"], [on, c, a], [on, d, b], [on, e, c], [
 goal([[on, e, "table"], [on, d, e], [on, c, d], [on, b, c], [on, a, b], [clear, a]]).
 % goal([[on, a, "table"], [on, c, a], [on, b, c], [clear, b]]).
 
+dfs(Start, Goal, Path) :-
+    dfs_util(Start, Goal, [Start], Path).
 
-% Trivial: if X is the goal return X as the path from X to X.
-dfs(X, [X], VISITED):- permutation(X,P),goal(P),!.
-% else expand X by Y and find path from Y
-dfs(X, [X|Ypath], VISITED):-
- 	connect(X, Y),printList(X),
-	%negmember(Y, VISITED), % replace negmember by notYetVisited when using on the block world
-  	notYetVisited(Y, VISITED),
-	dfs(Y, Ypath, [Y|VISITED]).
-
+% Internal DFS predicate with loop avoidance
+dfs_util(Goal, Goal, _, [Goal]) :- !.
+dfs_util(Current, Goal, Visited, [Current | Path]) :-
+    connect(Current, Next),%printList(Visited),
+    notYetVisited(Next, Visited),
+    dfs_util(Next, Goal, [Next | Visited], Path).
 
 % start(S),goal(G), dfs(S,P,[S]).
+%new  start(S),goal(G), dfs(S,G,P), printList(P).
