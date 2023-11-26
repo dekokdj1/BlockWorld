@@ -87,17 +87,6 @@ goal([[on, e, "table"], [on, d, e], [on, c, d], [on, b, c], [on, a, b], [clear, 
 dfs(Start, Goal, Path) :-
     dfs_util(Start, Goal, [Start], Path).
 
-% Internal DFS predicate with loop avoidance
-dfs_util(Goal, Goal, _, [Goal]) :- !.
-dfs_util(Current, Goal, Visited, [Current | Path]) :-
-    connect(Current, Next),%printList(Visited),
-    notYetVisited(Next, Visited),
-    dfs_util(Next, Goal, [Next | Visited], Path).
-
-dfs(Start, Goal, Path) :-
-    dfs_util(Start, Goal, [Start], Path).
-
-
 
 % Internal DFS predicate with loop avoidance
 dfs_util(Goal, Goal, _, [Goal]) :- !.
